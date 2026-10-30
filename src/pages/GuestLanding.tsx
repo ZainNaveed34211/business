@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import { AdSlot } from '../components/components';
-import { TOOL_DESCRIPTIONS, TOOL_ORDER, TOOL_TITLES } from '../lib/account';
 import { loginUrl, signupUrl } from '../lib/url';
 
 export default function GuestLanding(): ReactNode {
@@ -24,15 +23,23 @@ export default function GuestLanding(): ReactNode {
         </div>
       </section>
       <section className="section-block">
-        <h2>What Business &amp; Reputation covers</h2>
+        <h2>Three workspaces, one platform</h2>
         <div className="section-grid">
-          {TOOL_ORDER.map((tool) => (
-            <div key={tool} className="tool-card">
-              <h3>{TOOL_TITLES[tool]}</h3>
-              <p>{TOOL_DESCRIPTIONS[tool]}</p>
-              <span className="premium-tag">Premium</span>
-            </div>
-          ))}
+          <a href={loginUrl()} className="tool-card tool-link">
+            <h3>Business Intelligence</h3>
+            <p>Search visibility, business profile, social visibility, competitor intelligence, reputation analysis and reports.</p>
+            <span className="premium-tag">Premium</span>
+          </a>
+          <a href={loginUrl()} className="tool-card tool-link">
+            <h3>Growth Workspace</h3>
+            <p>Social management, content studio, content calendar, personal business guide, media strategy, shorts studio and campaigns.</p>
+            <span className="premium-tag">Premium</span>
+          </a>
+          <a href={loginUrl()} className="tool-card tool-link">
+            <h3>Advanced Security</h3>
+            <p>Security assessment, findings, risk prioritization, remediation guidance and history.</p>
+            <span className="lock-badge">Max only</span>
+          </a>
         </div>
       </section>
       <section className="section-block">

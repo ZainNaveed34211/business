@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { LOGO_URL, LOGO_DARK_URL } from '../logoData';
-import { TOOL_ORDER, TOOL_TITLES, type SessionStatus } from '../lib/account';
+import type { SessionStatus } from '../lib/account';
 import { ADSENSE_CLIENT } from '../lib/analytics';
 import { dashboardUrl, loginUrl, paymentsUrl, signupUrl } from '../lib/url';
 
@@ -99,29 +99,7 @@ export function Header({ status, email, onSignOut, signingOut }: { status: Sessi
   );
 }
 
-export function DashboardLayout({ status, children }: { status: SessionStatus; children: ReactNode }): ReactNode {
-  return (
-    <div className="dashboard">
-      <aside className="sidebar">
-        <Link to="/" className="sidebar-brand">
-          <Logo dark />
-        </Link>
-        <nav className="sidebar-nav">
-          <Link to="/" className="sidebar-link">Dashboard</Link>
-          {TOOL_ORDER.map((tool) => (
-            <Link key={tool} to={'/' + tool} className="sidebar-link">
-              {TOOL_TITLES[tool]}
-              {tool === 'security' && status !== 'max' ? <span className="lock-badge">Max only</span> : null}
-            </Link>
-          ))}
-        </nav>
-      </aside>
-      <div className="dashboard-main">{children}</div>
-    </div>
-  );
-}
-
-export function Footer(): ReactNode {
+export function Footer({ status }: { status: SessionStatus }): ReactNode {
   const year = new Date().getFullYear();
   return (
     <footer className="site-footer">
@@ -131,8 +109,16 @@ export function Footer(): ReactNode {
       </div>
       <div className="footer-links">
         <a href="https://kluzar.com/">Kluzar</a>
-        <a href={loginUrl()}>Log in</a>
-        <a href={paymentsUrl()}>Get Premium</a>
+        {status === 'guest' || status === 'unknown' || status === 'loading' ? (
+          <>
+            <a href={loginUrl()}>Log in</a>
+            <a href={signupUrl()}>Sign up</a>
+          </>
+        ) : status === 'free' ? (
+          <a href={paymentsUrl()}>Get Premium</a>
+        ) : (
+          <a href={dashboardUrl()}>Account</a>
+        )}
       </div>
       <div className="footer-meta">
         <span>© {year} Kluzar</span>

@@ -41,9 +41,3 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
-
-self.addEventListener('message', (event) => {
-  if (event.data === 'kluzar-skip-waiting') {
-    self.skipWaiting();
-  }
-});

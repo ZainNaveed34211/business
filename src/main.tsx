@@ -11,16 +11,7 @@ if (saved === 'dark' || saved === 'light') {
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').then((reg) => {
-      const check = () => {
-        if (reg.waiting) window.dispatchEvent(new Event('kluzar-sw-update'));
-      };
-      reg.addEventListener('updatefound', () => {
-        const sw = reg.installing;
-        if (sw) sw.addEventListener('statechange', check);
-      });
-      check();
-    }).catch(() => {});
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
   });
 }
 
