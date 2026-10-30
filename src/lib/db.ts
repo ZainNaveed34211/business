@@ -1,6 +1,6 @@
 const DB_NAME = 'kluzar-business';
-const DB_VERSION = 1;
-const STORES = ['profile', 'keywords', 'competitors', 'reviews', 'calendar', 'contents', 'campaigns', 'strategies', 'shorts', 'goals', 'guideDone', 'securityRuns', 'scoreHistory'];
+const DB_VERSION = 2;
+const STORES = ['profile', 'keywords', 'competitors', 'reviews', 'calendar', 'contents', 'campaigns', 'strategies', 'shorts', 'goals', 'guideDone', 'securityRuns', 'scoreHistory', 'connections', 'socialFigures'];
 
 function openDb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {

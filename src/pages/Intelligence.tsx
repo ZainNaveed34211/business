@@ -1,8 +1,8 @@
-import { useState, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { EmptyState, Loading } from '../components/components';
 import { ConnectNote, ScoreCard, WorkspaceLayout } from '../components/workspace';
-import { downloadText, toCsv, uid } from '../lib/data';
+import { downloadText, emptyProfile, toCsv, uid, type BusinessProfile } from '../lib/data';
 import { reviewThemes } from '../lib/guide';
 import { overallScore, profileScore } from '../lib/scores';
 import { useBusinessData } from '../lib/useData';
@@ -103,13 +103,43 @@ export function SearchPage({ status }: { status: SessionStatus }): ReactNode {
 }
 
 export function GbpPage({ status }: { status: SessionStatus }): ReactNode {
-  const { data, loaded } = useBusinessData();
+  const { data, loaded, save } = useBusinessData();
+  const [form, setForm] = useState<BusinessProfile>(emptyProfile());
+  const [formLoaded, setFormLoaded] = useState(false);
+  const [saved, setSaved] = useState(false);
+  useEffect(() => {
+    if (loaded && !formLoaded) {
+      if (data.profile) setForm(data.profile);
+      setFormLoaded(true);
+    }
+  }, [loaded, formLoaded, data.profile]);
   if (!loaded) return <Loading />;
+  const setField = (key: keyof BusinessProfile, value: string) => setForm((f) => ({ ...f, [key]: value }));
+  const saveProfile = async (e: FormEvent) => {
+    e.preventDefault();
+    await save('profile', { ...form, id: 'profile' });
+    setSaved(true);
+  };
   const prof = profileScore(data.profile);
   return (
     <Page status={status} title="Google Business Profile" eyebrow="Business Intelligence" accent="intelligence">
       <div className="score-grid">
         <ScoreCard label="Profile completeness" score={prof.score} detail={prof.filled + ' of ' + prof.total + ' business information fields filled.'} />
+      </div>
+      <div className="card">
+        <h3>Edit business information</h3>
+        <p>Fill this in here and the checklist below updates at once. This is your own business information, not data fetched from Google.</p>
+        <form className="form-grid" onSubmit={(e) => void saveProfile(e)}>
+          <Field label="Business name"><input className={inputClass()} value={form.businessName} onChange={(e) => setField('businessName', e.target.value)} /></Field>
+          <Field label="Website"><input className={inputClass()} value={form.website} onChange={(e) => setField('website', e.target.value)} /></Field>
+          <Field label="Description"><textarea className={inputClass()} value={form.description} onChange={(e) => setField('description', e.target.value)} /></Field>
+          <Field label="Hours"><input className={inputClass()} value={form.hours} onChange={(e) => setField('hours', e.target.value)} /></Field>
+          <Field label="Phone"><input className={inputClass()} value={form.phone} onChange={(e) => setField('phone', e.target.value)} /></Field>
+          <Field label="Address"><input className={inputClass()} value={form.address} onChange={(e) => setField('address', e.target.value)} /></Field>
+          <Field label="Photos count"><input className={inputClass()} value={form.photosCount} onChange={(e) => setField('photosCount', e.target.value)} /></Field>
+          <button type="submit" className="primary-btn">Save business information</button>
+        </form>
+        {saved ? <p>Profile saved.</p> : null}
       </div>
       <div className="card">
         <h3>Profile health checklist</h3>
@@ -126,8 +156,19 @@ export function GbpPage({ status }: { status: SessionStatus }): ReactNode {
 }
 
 export function SocialVisibilityPage({ status }: { status: SessionStatus }): ReactNode {
-  const { data, loaded } = useBusinessData();
+  const { data, loaded, save, remove } = useBusinessData();
+  const [figPlatform, setFigPlatform] = useState('Facebook');
+  const [figDate, setFigDate] = useState('');
+  const [followers, setFollowers] = useState('');
+  const [reach, setReach] = useState('');
+  const [impressions, setImpressions] = useState('');
+  const [engagement, setEngagement] = useState('');
   if (!loaded) return <Loading />;
+  const submitFigure = async (e: FormEvent) => {
+    e.preventDefault();
+    await save('socialFigures', { id: uid(), platform: figPlatform, date: figDate || new Date().toISOString().slice(0, 10), followers: followers.trim(), reach: reach.trim(), impressions: impressions.trim(), engagement: engagement.trim() });
+    setFigDate(''); setFollowers(''); setReach(''); setImpressions(''); setEngagement('');
+  };
   const selected = data.profile?.platforms || [];
   return (
     <Page status={status} title="Social Media Visibility" eyebrow="Business Intelligence" accent="intelligence">
@@ -136,6 +177,24 @@ export function SocialVisibilityPage({ status }: { status: SessionStatus }): Rea
           <tr key={p}><td>{p}</td><td>{selected.includes(p) ? 'Yes' : 'No'}</td><td>{data.calendar.filter((c) => c.platform === p && c.status === 'published').length}</td><td>{data.calendar.filter((c) => c.platform === p && c.status === 'scheduled').length}</td></tr>
         ))}
       </tbody></table></div>
+      <div className="card">
+        <h3>Add figures from a platform</h3>
+        <p>Copy these figures yourself from the platform dashboard. They are your own entries, not fetched from any API, and they are never estimated.</p>
+        <form className="form-grid" onSubmit={(e) => void submitFigure(e)}>
+          <Field label="Platform"><select className={inputClass()} value={figPlatform} onChange={(e) => setFigPlatform(e.target.value)}><option>Facebook</option><option>Instagram</option><option>YouTube</option><option>TikTok</option><option>LinkedIn</option></select></Field>
+          <Field label="Date"><input className={inputClass()} type="date" value={figDate} onChange={(e) => setFigDate(e.target.value)} /></Field>
+          <Field label="Followers"><input className={inputClass()} value={followers} onChange={(e) => setFollowers(e.target.value)} /></Field>
+          <Field label="Reach"><input className={inputClass()} value={reach} onChange={(e) => setReach(e.target.value)} /></Field>
+          <Field label="Impressions"><input className={inputClass()} value={impressions} onChange={(e) => setImpressions(e.target.value)} /></Field>
+          <Field label="Engagement"><input className={inputClass()} value={engagement} onChange={(e) => setEngagement(e.target.value)} /></Field>
+          <button type="submit" className="primary-btn">Save figures</button>
+        </form>
+      </div>
+      {data.socialFigures.length === 0 ? null : (
+        <div className="table-wrap"><table className="table"><thead><tr><th>Date</th><th>Platform</th><th>Followers</th><th>Reach</th><th>Impressions</th><th>Engagement</th><th></th></tr></thead><tbody>
+          {[...data.socialFigures].sort((a, b) => b.date.localeCompare(a.date)).map((f) => <tr key={f.id}><td>{f.date}</td><td>{f.platform}</td><td>{f.followers || '—'}</td><td>{f.reach || '—'}</td><td>{f.impressions || '—'}</td><td>{f.engagement || '—'}</td><td><button type="button" className="ghost-btn" onClick={() => void remove('socialFigures', f.id)}>Delete</button></td></tr>)}
+        </tbody></table></div>
+      )}
       <p>Published and scheduled counts come from your calendar only. Follower, reach and engagement figures need connected accounts and are not shown or estimated here.</p>
       <ConnectNote title="Social analytics connections" body="Facebook and Instagram need a Meta app with the relevant permissions. YouTube needs a Google OAuth client. TikTok and LinkedIn need their own developer apps. Each connection is configured separately and shows only data its API permits." />
     </Page>
@@ -273,6 +332,7 @@ export function ReportsPage({ status }: { status: SessionStatus }): ReactNode {
       <div className="card">
         <h3>Saved counts</h3>
         <p>Keywords: {data.keywords.length} · Competitors: {data.competitors.length} · Reviews: {data.reviews.length} · Calendar items: {data.calendar.length} · Campaigns: {data.campaigns.length} · Strategies: {data.strategies.length} · Shorts ideas: {data.shorts.length} · Score snapshots: {data.scoreHistory.length}</p>
+        {(data.keywords.length + data.competitors.length + data.reviews.length + data.calendar.length + data.campaigns.length + data.strategies.length + data.shorts.length) === 0 ? <p>No data saved yet. <Link to="/intelligence/search">Add a keyword</Link> · <Link to="/intelligence/reputation">Log a review</Link> · <Link to="/growth/content-studio">Write content</Link></p> : null}
       </div>
     </Page>
   );

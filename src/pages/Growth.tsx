@@ -55,15 +55,42 @@ const CONNECTION_NEEDS: { platform: string; need: string }[] = [
 ];
 
 export function SocialManagementPage({ status }: { status: SessionStatus }): ReactNode {
-  const { data, loaded } = useBusinessData();
+  const { data, loaded, save, remove } = useBusinessData();
+  const [platform, setPlatform] = useState('Facebook');
+  const [handle, setHandle] = useState('');
+  const [url, setUrl] = useState('');
+  const [connectedOn, setConnectedOn] = useState('');
+  const [notes, setNotes] = useState('');
   if (!loaded) return <Loading />;
+  const submitConnection = async (e: FormEvent) => {
+    e.preventDefault();
+    await save('connections', { id: uid(), platform, handle: handle.trim(), url: url.trim(), connectedOn, notes: notes.trim() });
+    setHandle(''); setUrl(''); setConnectedOn(''); setNotes('');
+  };
   return (
     <Page status={status} title="Social Media Management" eyebrow="Growth Workspace" accent="growth">
       <div className="table-wrap"><table className="table"><thead><tr><th>Platform</th><th>Status</th><th>Published</th><th>Scheduled</th><th>Drafts</th></tr></thead><tbody>
         {PLATFORMS.map((p) => (
-          <tr key={p}><td>{p}</td><td><span className="pill pill-plain">Not connected</span></td><td>{data.calendar.filter((c) => c.platform === p && c.status === 'published').length}</td><td>{data.calendar.filter((c) => c.platform === p && c.status === 'scheduled').length}</td><td>{data.contents.filter((c) => c.platform === p).length}</td></tr>
+          <tr key={p}><td>{p}</td><td>{data.connections.find((c) => c.platform === p) ? <span className="badge badge-yes">Recorded by you</span> : <span className="pill pill-plain">Not connected</span>}</td><td>{data.calendar.filter((c) => c.platform === p && c.status === 'published').length}</td><td>{data.calendar.filter((c) => c.platform === p && c.status === 'scheduled').length}</td><td>{data.contents.filter((c) => c.platform === p).length}</td></tr>
         ))}
       </tbody></table></div>
+      <div className="card">
+        <h3>Record a connection</h3>
+        <p>This record is your own note. It does not connect any API and does not enable publishing. Official API publishing stays disabled until OAuth is configured and tested.</p>
+        <form className="form-grid" onSubmit={(e) => void submitConnection(e)}>
+          <Field label="Platform"><select className={inputClass} value={platform} onChange={(e) => setPlatform(e.target.value)}>{PLATFORMS.map((p) => <option key={p}>{p}</option>)}</select></Field>
+          <Field label="Account handle or name"><input className={inputClass} value={handle} onChange={(e) => setHandle(e.target.value)} required /></Field>
+          <Field label="Profile URL"><input className={inputClass} value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://example.com/page" /></Field>
+          <Field label="Connected on"><input className={inputClass} type="date" value={connectedOn} onChange={(e) => setConnectedOn(e.target.value)} /></Field>
+          <Field label="Notes"><input className={inputClass} value={notes} onChange={(e) => setNotes(e.target.value)} /></Field>
+          <button type="submit" className="primary-btn">Save connection record</button>
+        </form>
+      </div>
+      {data.connections.length === 0 ? null : (
+        <div className="table-wrap"><table className="table"><thead><tr><th>Platform</th><th>Account</th><th>Connected on</th><th>Notes</th><th></th></tr></thead><tbody>
+          {data.connections.map((c) => <tr key={c.id}><td>{c.platform}</td><td>{c.handle || '—'}</td><td>{c.connectedOn || '—'}</td><td>{c.notes || '—'}</td><td><button type="button" className="ghost-btn" onClick={() => void remove('connections', c.id)}>Delete</button></td></tr>)}
+        </tbody></table></div>
+      )}
       {CONNECTION_NEEDS.map((c) => <ConnectNote key={c.platform} title={c.platform + ' connection'} body={c.need + ' Publishing through an official API is enabled only after that connection is configured and tested. Until then, scheduling here means your own plan, not a published post.'} />)}
       <div className="card">
         <h3>Publishing pipeline</h3>

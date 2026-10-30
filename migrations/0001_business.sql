@@ -159,3 +159,26 @@ CREATE INDEX IF NOT EXISTS idx_goals_user ON goals(user_id);
 CREATE INDEX IF NOT EXISTS idx_guide_done_user ON guide_done(user_id);
 CREATE INDEX IF NOT EXISTS idx_security_runs_user ON security_runs(user_id);
 CREATE INDEX IF NOT EXISTS idx_score_history_user ON score_history(user_id);
+CREATE TABLE IF NOT EXISTS connections (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  platform TEXT NOT NULL,
+  handle TEXT NOT NULL DEFAULT '',
+  url TEXT NOT NULL DEFAULT '',
+  connectedOn TEXT NOT NULL DEFAULT '',
+  notes TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS social_figures (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  platform TEXT NOT NULL,
+  date TEXT NOT NULL DEFAULT '',
+  followers TEXT NOT NULL DEFAULT '',
+  reach TEXT NOT NULL DEFAULT '',
+  impressions TEXT NOT NULL DEFAULT '',
+  engagement TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_connections_user ON connections(user_id);
+CREATE INDEX IF NOT EXISTS idx_social_figures_user ON social_figures(user_id);

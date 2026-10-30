@@ -40,7 +40,7 @@ export function SecurityOverview({ status }: { status: SessionStatus }): ReactNo
       </div>
       <div className="card">
         <h3>Automated server-side scanning</h3>
-        <p>The checklist above is fully functional today from your own answers. Automated server-side scanning of a website runs on the business-api Worker, which deploys after the business assertion approval. No automated scan result is shown until that Worker is live.</p>
+        <p>The checklist above is fully functional today from your own answers. Automated server-side scanning of a website runs on the business-api Worker at business-api.kluzar.com, which deploys after the remaining setup steps. No automated scan result is shown until that Worker is live.</p>
       </div>
     </Page>
   );
@@ -106,6 +106,7 @@ export function FindingsPage({ status }: { status: SessionStatus }): ReactNode {
   return (
     <Page status={status} title="Security Findings" eyebrow="Advanced Security · Max only" accent="security">
       <p>Latest run: {run.date.slice(0, 10)} · Score {run.score} / 100 · {findings.length} findings.</p>
+      <Link to="/security/assessment" className="ghost-btn">Re-run checklist</Link>
       {findings.length === 0 ? <EmptyState title="No findings in the latest run" body="Every answered checklist question was Yes. Re-run the checklist after any website change." /> : (
         <div className="table-wrap"><table className="table"><thead><tr><th>Check</th><th>Severity</th><th>Remediation</th></tr></thead><tbody>
           {findings.map((f) => <tr key={f.id}><td>{f.question}</td><td><span className={'badge badge-' + f.severity.toLowerCase()}>{f.severity}</span></td><td>{f.remediation}</td></tr>)}
@@ -119,7 +120,7 @@ export function RisksPage({ status }: { status: SessionStatus }): ReactNode {
   const { data, loaded } = useBusinessData();
   if (!loaded) return <Loading />;
   const run = latestRun(data);
-  if (!run) return <Page status={status} title="Risk Prioritization" eyebrow="Advanced Security · Max only" accent="security"><EmptyState title="No risks yet" body="Run the security checklist first. Risks are prioritized from your findings." /></Page>;
+  if (!run) return <Page status={status} title="Risk Prioritization" eyebrow="Advanced Security · Max only" accent="security"><EmptyState title="No risks yet" body="Run the security checklist first. Risks are prioritized from your findings." /><Link to="/security/assessment" className="ghost-btn">Open assessment</Link></Page>;
   const findings = securityFindings(run.answers).sort((a, b) => (SEVERITY_ORDER[a.severity] ?? 9) - (SEVERITY_ORDER[b.severity] ?? 9));
   return (
     <Page status={status} title="Risk Prioritization" eyebrow="Advanced Security · Max only" accent="security">
@@ -131,6 +132,7 @@ export function RisksPage({ status }: { status: SessionStatus }): ReactNode {
           <p>{f.remediation}</p>
         </div>
       ))}
+      <Link to="/security/assessment" className="ghost-btn">Re-run checklist after fixing</Link>
     </Page>
   );
 }
@@ -139,7 +141,7 @@ export function RemediationPage({ status }: { status: SessionStatus }): ReactNod
   const { data, loaded } = useBusinessData();
   if (!loaded) return <Loading />;
   const run = latestRun(data);
-  if (!run) return <Page status={status} title="Remediation Guidance" eyebrow="Advanced Security · Max only" accent="security"><EmptyState title="No remediation steps yet" body="Run the security checklist first. Each finding gets a remediation step here." /></Page>;
+  if (!run) return <Page status={status} title="Remediation Guidance" eyebrow="Advanced Security · Max only" accent="security"><EmptyState title="No remediation steps yet" body="Run the security checklist first. Each finding gets a remediation step here." /><Link to="/security/assessment" className="ghost-btn">Open assessment</Link></Page>;
   const findings = securityFindings(run.answers).sort((a, b) => (SEVERITY_ORDER[a.severity] ?? 9) - (SEVERITY_ORDER[b.severity] ?? 9));
   return (
     <Page status={status} title="Remediation Guidance" eyebrow="Advanced Security · Max only" accent="security">
@@ -177,6 +179,7 @@ export function HistoryPage({ status }: { status: SessionStatus }): ReactNode {
           </tbody></table></div>
         </>
       )}
+      <Link to="/security/assessment" className="ghost-btn">Run a new checklist</Link>
     </Page>
   );
 }

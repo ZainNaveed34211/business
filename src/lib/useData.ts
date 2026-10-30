@@ -21,7 +21,9 @@ export function useBusinessData(): { data: BusinessData; loaded: boolean; save: 
     const guideDone = await dbGetAll('guideDone');
     const securityRuns = await dbGetAll('securityRuns');
     const scoreHistory = await dbGetAll('scoreHistory');
-    setData({ profile, keywords, competitors, reviews, calendar, contents, campaigns, strategies, shorts, goals, guideDone, securityRuns, scoreHistory } as BusinessData);
+    const connections = await dbGetAll('connections');
+    const socialFigures = await dbGetAll('socialFigures');
+    setData({ profile, keywords, competitors, reviews, calendar, contents, campaigns, strategies, shorts, goals, guideDone, securityRuns, scoreHistory, connections, socialFigures } as BusinessData);
     setLoaded(true);
   }, []);
 

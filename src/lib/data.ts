@@ -30,6 +30,8 @@ export interface GoalItem { id: string; title: string; metric: string; target: s
 export interface GuideDone { id: string; recId: string; completedAt: string; }
 export interface SecurityRun { id: string; date: string; answers: Record<string, string>; score: number; }
 export interface ScorePoint { id: string; date: string; overall: number; profile: number; consistency: number | null; guide: number; }
+export interface ConnectionItem { id: string; platform: string; handle: string; url: string; connectedOn: string; notes: string; }
+export interface SocialFigureItem { id: string; platform: string; date: string; followers: string; reach: string; impressions: string; engagement: string; }
 
 export interface BusinessData {
   profile: BusinessProfile | null;
@@ -45,6 +47,8 @@ export interface BusinessData {
   guideDone: GuideDone[];
   securityRuns: SecurityRun[];
   scoreHistory: ScorePoint[];
+  connections: ConnectionItem[];
+  socialFigures: SocialFigureItem[];
 }
 
 export const PLATFORMS = ['Facebook', 'Instagram', 'YouTube', 'TikTok', 'LinkedIn'];
@@ -60,7 +64,7 @@ export function emptyProfile(): BusinessProfile {
 }
 
 export function emptyData(): BusinessData {
-  return { profile: null, keywords: [], competitors: [], reviews: [], calendar: [], contents: [], campaigns: [], strategies: [], shorts: [], goals: [], guideDone: [], securityRuns: [], scoreHistory: [] };
+  return { profile: null, keywords: [], competitors: [], reviews: [], calendar: [], contents: [], campaigns: [], strategies: [], shorts: [], goals: [], guideDone: [], securityRuns: [], scoreHistory: [], connections: [], socialFigures: [] };
 }
 
 export interface SecurityCheck { id: string; question: string; severity: string; remediation: string; }

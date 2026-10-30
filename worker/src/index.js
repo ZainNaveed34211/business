@@ -38,6 +38,8 @@ const COLLECTIONS = {
   goals: { table: 'goals', fields: { title: S(200), metric: S(50), target: S(100), deadline: S(20), done: B }, required: ['title'] },
   guideDone: { table: 'guide_done', fields: { recId: S(100) }, required: ['recId'] },
   scoreHistory: { table: 'score_history', fields: { overall: I(0, 100), profile: I(0, 100), consistency: I(0, 100), guide: I(0, 100) }, required: [] },
+  connections: { table: 'connections', fields: { platform: S(50), handle: S(200), url: S(2048), connectedOn: S(20), notes: S(2000) }, required: ['platform'] },
+  socialFigures: { table: 'social_figures', fields: { platform: S(50), date: S(20), followers: S(20), reach: S(20), impressions: S(20), engagement: S(20) }, required: ['platform'] },
 };
 
 for (const name of Object.keys(COLLECTIONS)) COLLECTIONS[name].name = name;

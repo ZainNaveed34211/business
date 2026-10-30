@@ -159,6 +159,8 @@ class MockDb {
       guide_done: [],
       security_runs: [],
       score_history: [],
+      connections: [],
+      socialFigures: [],
     };
   }
 
@@ -350,6 +352,16 @@ await test('worker assertion verify rejects bad signature', async () => {
     threw = true;
   }
   eq(threw, true, 'threw');
+});
+
+await test('worker connections crud for max', async () => {
+  const created = await call('/api/connections', 'POST', maxToken, { platform: 'Instagram', handle: '@acme', url: 'https://example.com/acme', connectedOn: '2026-10-30', notes: 'record' });
+  eq(created.status, 200, 'create status');
+  const listed = await call('/api/connections', 'GET', maxToken, undefined);
+  eq(listed.data.items.length, 1, 'one connection');
+  eq(listed.data.items[0].handle, '@acme', 'handle');
+  const removed = await call('/api/connections/delete', 'POST', maxToken, { id: listed.data.items[0].id });
+  eq(removed.data.deleted, true, 'deleted');
 });
 
 console.log(passed + ' passed, ' + failed + ' failed');

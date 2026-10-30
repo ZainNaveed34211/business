@@ -37,7 +37,7 @@ export function OverviewPage({ status, email }: { status: SessionStatus; email: 
         <h3>Welcome back</h3>
         <p>Signed in as {email}. Plan: {status === 'growth' ? 'Growth' : 'Max'}. Scores below are calculated only from your own saved data.</p>
         <p>{overall.coverage}</p>
-        <button type="button" className="ghost-btn" onClick={() => void saveSnapshot()}>Save score snapshot</button>
+        <button type="button" className="ghost-btn" onClick={() => void saveSnapshot()}>Save score snapshot</button> <Link to="/intelligence/search" className="ghost-btn">Add keyword</Link> <Link to="/growth/content-studio" className="ghost-btn">Write content</Link> <Link to="/growth/guide" className="ghost-btn">Add goal</Link> <Link to="/security/assessment" className="ghost-btn">Run security check</Link>
       </div>
       <div className="score-grid">
         <ScoreCard label="Overall Business Visibility Score" score={overall.overall} detail={overall.coverage} />
