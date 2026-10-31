@@ -967,7 +967,7 @@ button {
 }
 
 .primary-btn {
-  background: linear-gradient(135deg, #141272, #7c5cff);
+  background: linear-gradient(135deg, #141272, #5F3EC1);
   border-color: transparent;
   box-shadow: 0 8px 20px rgba(95, 62, 193, 0.35);
 }
@@ -991,7 +991,7 @@ button {
 }
 
 .sidebar-link.active {
-  background: linear-gradient(135deg, #7c5cff, #22d3ee);
+  background: linear-gradient(135deg, #5F3EC1, #22d3ee);
   box-shadow: 0 6px 16px rgba(95, 62, 193, 0.4);
 }
 
